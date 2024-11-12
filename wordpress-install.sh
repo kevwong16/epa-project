@@ -12,5 +12,6 @@ sudo mariadb -u root
 # exit;
 # wget wp-config.php from s3bucket
 sudo chmod 640 wp-config.php
+sudo chown -R www-data:www-data wordpress/
 sudo cd /etc/nginx/conf.d/
 # sudo touch wordpress.conf pull from s3bucket
