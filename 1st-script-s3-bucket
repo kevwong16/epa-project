@@ -1,0 +1,5 @@
+#!/bin/bash
+sudo cd /root
+sudo wget https://kevin-epa-bucket.s3.us-east-1.amazonaws.com/git-setup.sh
+sudo chmod 755 git-setup.sh
+sudo bash git-setup.sh
