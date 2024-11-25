@@ -18,7 +18,7 @@ sudo wget -O /var/www/html/wp-config.php https://kevin-epa-bucket.s3.us-east-1.a
 sudo chmod 640 /var/www/html/wp-config.php 
 sudo chown -R www-data:www-data /var/www/html/
 
-sed -i "s/password_here/$password/g" wp-config.php
+sed -i "s/password_here/$password/g" /var/www/html/wp-config.php
 
 # sudo cd /etc/nginx/conf.d/
 # sudo touch wordpress.conf pull from s3bucket
