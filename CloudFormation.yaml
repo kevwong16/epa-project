@@ -10,8 +10,7 @@ Resources:
       ImageId: ami-04a81a99f5ec58529
       InstanceType: t2.micro
       SecurityGroups:
-        - !Ref SSHSecurityGroup
-        - !Ref ServerSecurityGroup
+        - !Ref InstanceSecurityGroup  # Use the defined security group here
       KeyName: kev-admin
       UserData:
         Fn::Base64: !Sub |
