@@ -1,20 +1,53 @@
 #!/bin/bash
-sudo touch /root/testing.txt # this file will contain the output of our LEMP stack unit tests
+
+# Create a file to store the output of the LEMP stack unit tests
+sudo touch /root/testing.txt
+
+# Install Nginx web server
 sudo apt -y install nginx
-sudo systemctl start nginx && sudo systemctl enable nginx # this starts and enables nginx on a server reboot. The 2nd command will only run if the first command is successful
+
+# Start Nginx service and enable it to run on server boot; the second command executes only if the first succeeds
+sudo systemctl start nginx && sudo systemctl enable nginx
+
+# Save the status of the Nginx service to the testing log file
 sudo systemctl status nginx > /root/testing.txt
+
+# Install MariaDB database server
 sudo apt -y install mariadb-server
+
+# Start MariaDB service and enable it to run on server boot
 sudo systemctl start mariadb && sudo systemctl enable mariadb
+
+# Append the status of the MariaDB service to the testing log file
 systemctl status mariadb >> /root/testing.txt
+
+# Install PHP and common PHP extensions required for a typical LEMP stack
 sudo apt -y install php php-cli php-common php-imap php-fpm php-snmp php-xml php-zip php-mbstring php-curl php-mysqli php-gd php-intl
+
+# Append the installed PHP version to the testing log file
 sudo php -v >> /root/testing.txt
-sudo systemctl stop apache2 # stops apache because we're already using nginx
-sudo systemctl disable apache2 # disables apache from starting on a server reboot
-# command to fully remove apache2
+
+# Stop the Apache2 service (as Nginx will be used instead)
+sudo systemctl stop apache2
+
+# Disable Apache2 service to prevent it from starting on server boot
+sudo systemctl disable apache2
+
+# Optional: Fully remove Apache2 (commented out as it's not being executed)
 # sudo apt remove --purge apache2
-sudo mv /var/www/html/index.html /var/www/html/index.html.old # rename apache testing page
+
+# Rename the default Apache testing page (if present)
+sudo mv /var/www/html/index.html /var/www/html/index.html.old
+
+# Replace the Nginx configuration file with a custom one
 sudo mv /root/epa-project/nginx.conf /etc/nginx/conf.d/nginx.conf
+
+# Replace the placeholder in the Nginx configuration with the actual DNS record
 dns_record="epa.kevwong.uk"
 sed -i "s/SERVERNAME/$dns_record/g" /etc/nginx/conf.d/nginx.conf
-nginx -t && systemctl reload nginx # this will only reload nginx if the test is successful
+
+# Test the Nginx configuration for syntax errors, and reload it only if the test is successful
+nginx -t && systemctl reload nginx
+
+# Run a custom script to install SSL certificates using Certbot
 sudo bash /root/epa-project/certbot-ssl-install.sh
