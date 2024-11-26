@@ -38,5 +38,6 @@ check_exit_status "chmod"
 
 # Run the setup script
 echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
-sudo bash /root/epa-project/lemp-setup.sh
-check_exit_status "lemp-setup.sh script"
+
+# sudo bash /root/epa-project/lemp-setup.sh
+# check_exit_status "lemp-setup.sh script"
