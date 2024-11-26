@@ -27,6 +27,12 @@ sudo apt -y install php php-cli php-common php-imap php-fpm php-snmp php-xml php
 # Append the installed PHP version to the testing log file
 sudo php -v >> /root/testing.txt
 
+sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 512M/g' /etc/php/8.3/fpm/php.ini
+
+sed -i 's/post_max_size = 8M/post_max_size = 512M/g' /etc/php/8.3/fpm/php.ini
+
+sudo systemctl restart php8.3-fpm
+
 # Stop the Apache2 service (as Nginx will be used instead)
 sudo systemctl stop apache2
 
@@ -44,11 +50,10 @@ sudo mv /root/epa-project/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # Define the DNS record for the WordPress site.
 my_domain="epa.kevwong.uk"
-
 elastic_ip=$(curl -s icanhazip.com)
 
 CF_API=
-CF_ZONE_ID=efe7e303d4cbb2728b1535ebb97acbd5
+CF_ZONE_ID=
 
 curl --request POST \
   --url https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records \
