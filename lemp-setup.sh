@@ -46,7 +46,7 @@ sudo systemctl disable apache2
 sudo mv /var/www/html/index.html /var/www/html/index.html.old
 
 # Replace the Nginx configuration file with a custom one
-sudo mv /root/epa-project/nginx.conf /etc/nginx/conf.d/nginx.conf
+sudo mv /home/ubuntu/epa-project/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # Define the DNS record for the WordPress site.
 my_domain=REPLACE_DOMAIN
