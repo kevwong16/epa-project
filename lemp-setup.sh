@@ -49,11 +49,11 @@ sudo mv /var/www/html/index.html /var/www/html/index.html.old
 sudo mv /home/ubuntu/epa-project/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # Define the DNS record for the WordPress site.
-my_domain="epa.kevwong.uk"
-elastic_ip=$(curl -s icanhazip.com)
+my_domain=REPLACE_DOMAIN
+elastic_ip=REPLACE_MY_ELASTIC_IP
 
-CF_API=
-CF_ZONE_ID=
+CF_API=REPLACE_CF_API
+CF_ZONE_ID=REPLACE_CF_ZONE_ID
 
 curl --request POST \
   --url https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records \
