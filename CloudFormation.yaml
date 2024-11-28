@@ -11,7 +11,7 @@ Resources:
       InstanceType: t2.micro
       SecurityGroups:
         - !Ref InstanceSecurityGroup  # Use the defined security group here
-      KeyName: kev-admin
+      KeyName: githubactionsepa
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -54,19 +54,15 @@ Resources:
 
           # Run the setup script
           echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
-          sudo bash /root/epa-project/lemp-setup.sh
-          check_exit_status "lemp-setup.sh script"
-
-  # Elastic IP resource
-  MyElasticIP:
-    Type: AWS::EC2::EIP
+          # sudo bash /root/epa-project/lemp-setup.sh
+          # check_exit_status "lemp-setup.sh script"
 
   # Elastic IP association with the instance
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       InstanceId: !Ref MyInstance
-      EIP: !Ref MyElasticIP
+      EIP: '34.225.228.146'
 
   # EC2 security group with ports 22, 80, and 443
   InstanceSecurityGroup:
