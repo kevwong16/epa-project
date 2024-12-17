@@ -54,6 +54,9 @@ sudo chmod 640 /var/www/html/wp-config.php
 # Set ownership of the entire WordPress directory to the `www-data` user and group
 sudo chown -R www-data:www-data /var/www/html/
 
+mysql -h $aws_rds_endpoint -u $rds_username -p$rds_password -e "CREATE DATABASE IF NOT EXISTS $rds_username;"
+
+
 # Replace the placeholder 'password_here' in wp-config.php with the generated password.
 sed -i "s/password_here/$rds_password/g" /var/www/html/wp-config.php
 sed -i "s/username_here/$rds_username/g" /var/www/html/wp-config.php
