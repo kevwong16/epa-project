@@ -13,13 +13,15 @@ sudo systemctl start nginx && sudo systemctl enable nginx
 sudo systemctl status nginx > /root/testing.txt
 
 # Install MariaDB database server
-sudo apt -y install mariadb-server
+# sudo apt -y install mariadb-server
 
 # Start MariaDB service and enable it to run on server boot
-sudo systemctl start mariadb && sudo systemctl enable mariadb
+# sudo systemctl start mariadb && sudo systemctl enable mariadb
 
 # Append the status of the MariaDB service to the testing log file
-systemctl status mariadb >> /root/testing.txt
+# systemctl status mariadb >> /root/testing.txt
+
+sudo apt -y install unzip wget mariadb-client
 
 # Install PHP and common PHP extensions required for a typical LEMP stack
 sudo apt -y install php php-cli php-common php-imap php-fpm php-snmp php-xml php-zip php-mbstring php-curl php-mysqli php-gd php-intl
