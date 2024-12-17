@@ -9,8 +9,8 @@ Resources:
       AvailabilityZone: us-east-1a
       ImageId: ami-04a81a99f5ec58529
       InstanceType: t2.micro
-      SecurityGroups:
-        - !Ref InstanceSecurityGroup  # Use the defined security group here
+      SecurityGroupIds:  # Use SecurityGroupIds for existing security group
+        - sg-00c17b08a87a89bfb
       KeyName: githubactionsepa
       UserData:
         Fn::Base64: !Sub |
@@ -63,22 +63,3 @@ Resources:
     Properties:
       InstanceId: !Ref MyInstance
       AllocationId: eipalloc-0fcfaf56ef4f1f122
-
-  # EC2 security group with ports 22, 80, and 443
-  InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable access via ports 22, 80, and 443
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
