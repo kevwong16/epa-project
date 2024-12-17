@@ -62,7 +62,7 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       InstanceId: !Ref MyInstance
-      AllocationId: eipalloc-0ce25e44a2717ed15
+      AllocationId: eipalloc-0fcfaf56ef4f1f122
 
   # EC2 security group with ports 22, 80, and 443
   InstanceSecurityGroup:
