@@ -9,9 +9,9 @@ Resources:
       AvailabilityZone: us-east-1a
       ImageId: ami-04a81a99f5ec58529
       InstanceType: t2.micro
-      SecurityGroups:
-        - !Ref InstanceSecurityGroup  # Use the defined security group here
-      KeyName: kev-admin
+      SecurityGroupIds:  # Use SecurityGroupIds for existing security group
+        - sg-00c17b08a87a89bfb
+      KeyName: githubactionsepa
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -43,46 +43,23 @@ Resources:
           check_exit_status "apt upgrade"
 
           # Clone the GitHub repository
-          echo "Cloning GitHub repository..." | tee -a $LOG_FILE
-          sudo git clone https://github.com/kevwong16/epa-project.git /root/epa-project
-          check_exit_status "git clone"
+          # echo "Cloning GitHub repository..." | tee -a $LOG_FILE
+          # sudo git clone https://github.com/kevwong16/epa-project.git /root/epa-project
+          # check_exit_status "git clone"
 
           # Change permissions of the cloned repository
-          echo "Changing permissions of the cloned repository..." | tee -a $LOG_FILE
-          sudo chmod -R 755 /root/epa-project
-          check_exit_status "chmod"
+          # echo "Changing permissions of the cloned repository..." | tee -a $LOG_FILE
+          # sudo chmod -R 755 /root/epa-project
+          # check_exit_status "chmod"
 
           # Run the setup script
-          echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
-          sudo bash /root/epa-project/lemp-setup.sh
-          check_exit_status "lemp-setup.sh script"
-
-  # Elastic IP resource
-  MyElasticIP:
-    Type: AWS::EC2::EIP
+          # echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
+          # sudo bash /root/epa-project/lemp-setup.sh
+          # check_exit_status "lemp-setup.sh script"
 
   # Elastic IP association with the instance
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       InstanceId: !Ref MyInstance
-      EIP: !Ref MyElasticIP
-
-  # EC2 security group with ports 22, 80, and 443
-  InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable access via ports 22, 80, and 443
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
+      AllocationId: eipalloc-0fcfaf56ef4f1f122

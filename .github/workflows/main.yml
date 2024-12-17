@@ -32,7 +32,10 @@ jobs:
         sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./lemp-setup.sh
         sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./certbot-ssl-install.sh
         sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./certbot-ssl-install.sh
-        
+        sed -i 's/AWS_RDS_ENDPOINT/${{ secrets.AWS_RDS_ENDPOINT }}/g' ./wordpress-install.sh
+        sed -i 's/RDS_USER/${{ secrets.RDS_USER }}/g' ./wordpress-install.sh
+        sed -i 's/RDS_PASSWORD/${{ secrets.RDS_PASSWORD }}/g' ./wordpress-install.sh
+
     - name: Copy files to VM
       run: |
         scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~
