@@ -1,25 +1,34 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09' 
+# Specifies the AWS CloudFormation template version being used.
+
 Description: >-
   CloudFormation template to create EC2 instance, assigns elastic IP and runs update and upgrade
+# A description of the template's purpose.
 
 Resources:
   MyInstance:
     Type: AWS::EC2::Instance
+    # Defines an EC2 instance resource.
     Properties:
       AvailabilityZone: us-east-1a
+      # Specifies the availability zone where the instance will be launched.
       ImageId: ami-04a81a99f5ec58529
+      # Specifies the Amazon Machine Image (AMI) ID for the instance.
       InstanceType: t2.micro
-      SecurityGroupIds:  # Use SecurityGroupIds for existing security group
+      # Defines the type of EC2 instance (e.g., t2.micro for a lightweight instance).
+      SecurityGroupIds:
         - sg-00c17b08a87a89bfb
+        # Associates the instance with the specified security group to control inbound and outbound traffic.
       KeyName: githubactionsepa
+      # Specifies the key pair name to allow SSH access to the instance.
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
+          # User data script to execute commands on instance initialization.
 
-          # Log file path
           LOG_FILE="/var/log/script_execution.log"
+          # Defines the log file location for the script's output.
 
-          # Function to check the exit status of the last executed command
           check_exit_status() {
               if [ $? -ne 0 ]; then
                   echo "Error: $1 failed." | tee -a $LOG_FILE
@@ -28,23 +37,26 @@ Resources:
                   echo "$1 succeeded." | tee -a $LOG_FILE
               fi
           }
+          # A helper function to check the exit status of commands and log the outcome.
 
-          # Clear the log file at the beginning of the script
           > $LOG_FILE
+          # Clears any existing content in the log file.
 
-          # Update package lists
           echo "Running apt update..." | tee -a $LOG_FILE
           sudo apt -y update
           check_exit_status "apt update"
+          # Updates the package list on the instance and logs the outcome.
 
-          # Upgrade installed packages
           echo "Running apt upgrade..." | tee -a $LOG_FILE
           sudo apt -y upgrade
           check_exit_status "apt upgrade"
+          # Upgrades all installed packages to their latest versions and logs the outcome.
 
-  # Elastic IP association with the instance
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
+    # Defines a resource to associate an Elastic IP (EIP) with the EC2 instance.
     Properties:
       InstanceId: !Ref MyInstance
+      # References the ID of the EC2 instance to associate with the EIP.
       AllocationId: eipalloc-0fcfaf56ef4f1f122
+      # Specifies the allocation ID of the Elastic IP to associate.
