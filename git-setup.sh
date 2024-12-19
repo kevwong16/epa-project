@@ -35,9 +35,3 @@ check_exit_status "git clone"
 echo "Changing permissions of the cloned repository..." | tee -a $LOG_FILE
 sudo chmod -R 755 /root/epa-project
 check_exit_status "chmod"
-
-# Run the setup script
-echo "Running lemp-setup.sh script..." | tee -a $LOG_FILE
-
-# sudo bash /root/epa-project/lemp-setup.sh
-# check_exit_status "lemp-setup.sh script"
