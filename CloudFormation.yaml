@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  CloudFormation template to create EC2 instance with security group
+  CloudFormation template to create EC2 instance, assigns elastic IP and runs update and upgrade
 
 Resources:
   MyInstance:
