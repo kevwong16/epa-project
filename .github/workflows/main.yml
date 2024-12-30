@@ -39,10 +39,6 @@ jobs:
         sudo chmod 600 /root/.ssh/id_rsa &&
         sudo chmod 600 /root/.ssh/known_hosts"
 
-    - name: Remove Existing HTML Directory
-      run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo rm -rf /var/www/html"
-
     - name: Run LEMP Setup
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/lemp-setup.sh'
@@ -55,6 +51,14 @@ jobs:
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/wordpress-install.sh'
 
+    - name: Remove Existing HTML Directory
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo rm -rf /var/www/html"
+
     - name: Clone Git Repository as Root
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo git clone git@github.com:kevwong16/wordpress-files.git /var/www/html'
+
+    - name: Set Ownership of HTML Directory
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo chown -R www-data:www-data /var/www/html"
