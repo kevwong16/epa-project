@@ -24,15 +24,16 @@ jobs:
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
         mkdir -p ~/.ssh &&
         echo '${{ secrets.SSH_PRIVATE_KEY }}' > ~/.ssh/id_rsa &&
-        chmod 600 ~/.ssh/id_rsa"
+        chmod 600 ~/.ssh/id_rsa &&
+        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub"
 
     - name: Copy SSH Key to Root
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
-        sudo mkdir -p /root/.ssh && 
-        sudo cp ~/.ssh/id_rsa /root/.ssh/ && 
-        sudo cp ~/.ssh/id_rsa.pub /root/.ssh/ && 
-        sudo cp ~/.ssh/known_hosts /root/.ssh/ && 
+        sudo mkdir -p /root/.ssh &&
+        sudo cp ~/.ssh/id_rsa /root/.ssh/ &&
+        sudo cp ~/.ssh/id_rsa.pub /root/.ssh/ &&
+        sudo cp ~/.ssh/known_hosts /root/.ssh/ &&
         sudo chmod 600 /root/.ssh/id_rsa"
 
     - name: Remove Existing HTML Directory
