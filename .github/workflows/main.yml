@@ -35,11 +35,18 @@ jobs:
       run: |
         scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~
 
-    - name: Copy SSH key to VM
+    - name: Copy SSH Key to Root
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
-        scp -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} private_key ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~/.ssh/id_rsa
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "chmod 600 ~/.ssh/id_rsa"
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
+        sudo mkdir -p /root/.ssh && 
+        sudo cp /home/ubuntu/.ssh/id_rsa /root/.ssh/ && 
+        sudo cp /home/ubuntu/.ssh/id_rsa.pub /root/.ssh/ && 
+        sudo cp /home/ubuntu/.ssh/known_hosts /root/.ssh/ && 
+        sudo chmod 600 /root/.ssh/id_rsa"
+
+    - name: Remove Existing HTML Directory
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo rm -rf /var/www/html"
 
     - name: Run LEMP Setup
       run: |
@@ -52,3 +59,7 @@ jobs:
     - name: Run Wordpress install
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/wordpress-install.sh'
+
+    - name: Clone Git Repository as Root
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo git clone git@github.com:kevwong16/wordpress-files.git /var/www/html'
