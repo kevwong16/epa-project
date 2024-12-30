@@ -39,6 +39,13 @@ jobs:
         sudo chmod 600 /root/.ssh/id_rsa &&
         sudo chmod 600 /root/.ssh/known_hosts"
 
+    - name: Ensure HTML Directory is Empty
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
+        if [ -d /var/www/html ]; then
+          sudo rm -rf /var/www/html/*
+        fi"
+
     - name: Run LEMP Setup
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/lemp-setup.sh'
@@ -50,10 +57,6 @@ jobs:
     - name: Run Wordpress install
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/wordpress-install.sh'
-
-    - name: Remove Existing HTML Directory
-      run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo rm -rf /var/www/html"
 
     - name: Clone Git Repository as Root
       run: |
