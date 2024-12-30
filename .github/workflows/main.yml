@@ -19,13 +19,15 @@ jobs:
         chmod 600 private_key
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "echo 'SSH Connection Successful'"
 
-    - name: Add SSH Key to Ubuntu User
+    - name: Add SSH Key and Generate Known Hosts
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
         mkdir -p ~/.ssh &&
         echo '${{ secrets.SSH_PRIVATE_KEY }}' > ~/.ssh/id_rsa &&
         chmod 600 ~/.ssh/id_rsa &&
-        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub"
+        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub &&
+        ssh-keyscan github.com > ~/.ssh/known_hosts &&
+        chmod 600 ~/.ssh/known_hosts"
 
     - name: Copy SSH Key to Root
       run: |
@@ -34,7 +36,8 @@ jobs:
         sudo cp ~/.ssh/id_rsa /root/.ssh/ &&
         sudo cp ~/.ssh/id_rsa.pub /root/.ssh/ &&
         sudo cp ~/.ssh/known_hosts /root/.ssh/ &&
-        sudo chmod 600 /root/.ssh/id_rsa"
+        sudo chmod 600 /root/.ssh/id_rsa &&
+        sudo chmod 600 /root/.ssh/known_hosts"
 
     - name: Remove Existing HTML Directory
       run: |
