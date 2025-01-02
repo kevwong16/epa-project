@@ -1,80 +1,80 @@
-name: Test and Deploy Bash Script
+name: Deploy WordPress with LEMP Stack and SSL
 
 on:
   push:
     branches:
-      - main
+      - main # Trigger the workflow when changes are pushed to the `main` branch.
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner.
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4 # Check out the code from the repository.
 
     - name: Debug SSH connection
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-        chmod 600 private_key
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "echo 'SSH Connection Successful'"
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key # Write the private SSH key to a file.
+        chmod 600 private_key # Restrict permissions for the private key file.
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "echo 'SSH Connection Successful'" # Test the SSH connection.
 
     - name: Add SSH Key and Generate Known Hosts
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
-        mkdir -p ~/.ssh &&
-        echo '${{ secrets.SSH_PRIVATE_KEY }}' > ~/.ssh/id_rsa &&
-        chmod 600 ~/.ssh/id_rsa &&
-        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub &&
-        ssh-keyscan github.com > ~/.ssh/known_hosts &&
-        chmod 600 ~/.ssh/known_hosts"
+        mkdir -p ~/.ssh && # Ensure the SSH directory exists.
+        echo '${{ secrets.SSH_PRIVATE_KEY }}' > ~/.ssh/id_rsa && # Add the private key to the SSH directory.
+        chmod 600 ~/.ssh/id_rsa && # Set appropriate permissions for the key.
+        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub && # Generate the public key from the private key.
+        ssh-keyscan github.com > ~/.ssh/known_hosts && # Add GitHub to known hosts to avoid prompts during SSH connections.
+        chmod 600 ~/.ssh/known_hosts" # Secure the known hosts file.
 
     - name: Copy SSH Key to Root
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "
-        sudo mkdir -p /root/.ssh &&
-        sudo cp ~/.ssh/id_rsa /root/.ssh/ &&
-        sudo cp ~/.ssh/id_rsa.pub /root/.ssh/ &&
-        sudo cp ~/.ssh/known_hosts /root/.ssh/ &&
-        sudo chmod 600 /root/.ssh/id_rsa &&
-        sudo chmod 600 /root/.ssh/known_hosts"
+        sudo mkdir -p /root/.ssh && # Ensure root's SSH directory exists.
+        sudo cp ~/.ssh/id_rsa /root/.ssh/ && # Copy the private key to root's SSH directory.
+        sudo cp ~/.ssh/id_rsa.pub /root/.ssh/ && # Copy the public key to root's SSH directory.
+        sudo cp ~/.ssh/known_hosts /root/.ssh/ && # Copy the known hosts file to root's SSH directory.
+        sudo chmod 600 /root/.ssh/id_rsa && # Secure the private key in root's directory.
+        sudo chmod 600 /root/.ssh/known_hosts" # Secure the known hosts file in root's directory.
 
     - name: Edit Script Variables
       run: |
-        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_MY_ELASTIC_IP/${{ secrets.MY_ELASTIC_IP }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./lemp-setup.sh
-        sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./certbot-ssl-install.sh
-        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./certbot-ssl-install.sh
-        sed -i 's/AWS_RDS_ENDPOINT/${{ secrets.AWS_RDS_ENDPOINT }}/g' ./wordpress-install.sh
-        sed -i 's/RDS_USER/${{ secrets.RDS_USER }}/g' ./wordpress-install.sh
-        sed -i 's/RDS_PASSWORD/${{ secrets.RDS_PASSWORD }}/g' ./wordpress-install.sh
+        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./lemp-setup.sh # Replace placeholder with the domain in lemp-setup.sh.
+        sed -i 's/REPLACE_MY_ELASTIC_IP/${{ secrets.MY_ELASTIC_IP }}/g' ./lemp-setup.sh # Replace placeholder with the Elastic IP in lemp-setup.sh.
+        sed -i 's/REPLACE_CF_API/${{ secrets.CF_API }}/g' ./lemp-setup.sh # Replace placeholder with the Cloudflare API key.
+        sed -i 's/REPLACE_CF_ZONE_ID/${{ secrets.CF_ZONE_ID }}/g' ./lemp-setup.sh # Replace placeholder with the Cloudflare zone ID.
+        sed -i 's/REPLACE_EMAIL/${{ secrets.EMAIL }}/g' ./certbot-ssl-install.sh # Replace placeholder with email in certbot-ssl-install.sh.
+        sed -i 's/REPLACE_DOMAIN/${{ secrets.DOMAIN }}/g' ./certbot-ssl-install.sh # Replace domain placeholder in certbot-ssl-install.sh.
+        sed -i 's/AWS_RDS_ENDPOINT/${{ secrets.AWS_RDS_ENDPOINT }}/g' ./wordpress-install.sh # Replace RDS endpoint in wordpress-install.sh.
+        sed -i 's/RDS_USER/${{ secrets.RDS_USER }}/g' ./wordpress-install.sh # Replace RDS username in wordpress-install.sh.
+        sed -i 's/RDS_PASSWORD/${{ secrets.RDS_PASSWORD }}/g' ./wordpress-install.sh # Replace RDS password in wordpress-install.sh.
 
     - name: Copy files to VM
       run: |
-        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~
+        scp -r -i private_key -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} "${PWD}" ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }}:~ # Securely copy all files to the remote VM.
 
     - name: Run LEMP Setup
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/lemp-setup.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/lemp-setup.sh' # Execute LEMP setup script on the remote server.
 
     - name: Run certbot install
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/certbot-ssl-install.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/certbot-ssl-install.sh' # Execute Certbot SSL installation script.
 
     - name: Run Wordpress install
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/wordpress-install.sh'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo sh /home/ubuntu/epa-project/wordpress-install.sh' # Execute WordPress installation script.
 
     - name: Remove Existing HTML Directory
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo rm -rf /var/www/html"
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo rm -rf /var/www/html" # Remove the current HTML directory to prepare for new files.
 
     - name: Clone Git Repository as Root
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo git clone git@github.com:kevwong16/wordpress-files.git /var/www/html'
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} 'sudo git clone git@github.com:kevwong16/wordpress-files.git /var/www/html' # Clone the WordPress files from GitHub to the HTML directory.
 
     - name: Set Ownership of HTML Directory
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo chown -R www-data:www-data /var/www/html"
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo chown -R www-data:www-data /var/www/html" # Set ownership of the HTML directory to the web server user.
