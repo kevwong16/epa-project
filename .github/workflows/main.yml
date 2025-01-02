@@ -78,3 +78,7 @@ jobs:
     - name: Set Ownership of HTML Directory
       run: |
         ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "sudo chown -R www-data:www-data /var/www/html" # Set ownership of the HTML directory to the web server user.
+
+    - name: Restore Database
+      run: |
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "mysql admin -h database-1.cgogyk40u18x.us-east-1.rds.amazonaws.com -u admin -p'${{ secrets.RDS_PASSWORD }}' < /var/www/html/database_dump.sql" # Restore the database.
