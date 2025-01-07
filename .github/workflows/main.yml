@@ -81,4 +81,4 @@ jobs:
 
     - name: Restore Database
       run: |
-        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "mysql admin -h database-1.cgogyk40u18x.us-east-1.rds.amazonaws.com -u admin -p'${{ secrets.RDS_PASSWORD }}' < /var/www/html/database_dump.sql" # Restore the database.
+        ssh -i private_key -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.MY_ELASTIC_IP }} "mysql admin -h ${{ secrets.RDS_HOST }} -u admin -p'${{ secrets.RDS_PASSWORD }}' < /var/www/html/database_dump.sql" # Restore the database.
