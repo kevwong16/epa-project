@@ -3,6 +3,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >-
   CloudFormation template to create EC2 instance, assigns elastic IP and runs update and upgrade
+  Also creates CloudWatch alarms for high CPU utilization and unauthorized access attempts.
 # A description of the template's purpose.
 
 Resources:
@@ -60,3 +61,63 @@ Resources:
       # References the ID of the EC2 instance to associate with the EIP.
       AllocationId: eipalloc-0fcfaf56ef4f1f122
       # Specifies the allocation ID of the Elastic IP to associate.
+
+  HighCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    # Defines a CloudWatch alarm resource.
+    Properties:
+      AlarmName: HighCPUUtilizationAlarm
+      # Specifies the name of the alarm.
+      AlarmDescription: Alarm triggered when CPU utilization exceeds 80%.
+      # Describes the purpose of the alarm.
+      MetricName: CPUUtilization
+      # Specifies the metric to monitor.
+      Namespace: AWS/EC2
+      # Defines the namespace of the metric.
+      Statistic: Average
+      # Specifies the statistic to evaluate (e.g., Average).
+      Period: 300
+      # Defines the evaluation period in seconds (e.g., 300 seconds = 5 minutes).
+      EvaluationPeriods: 1
+      # The number of periods over which data is compared to the threshold.
+      Threshold: 80
+      # The threshold value for triggering the alarm.
+      ComparisonOperator: GreaterThanThreshold
+      # Specifies the condition for triggering the alarm (e.g., GreaterThanThreshold).
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref MyInstance
+          # Monitors the specified EC2 instance.
+      AlarmActions:
+        - arn:aws:sns:us-east-1:772362934603:Default_CloudWatch_Alarms_Topic
+        # The ARN of the SNS topic to notify when the alarm is triggered.
+
+  UnauthorizedAccessAlarm:
+    Type: AWS::CloudWatch::Alarm
+    # Defines a CloudWatch alarm for unauthorized access attempts.
+    Properties:
+      AlarmName: UnauthorizedAccessAttemptsAlarm
+      # Specifies the name of the alarm.
+      AlarmDescription: Alarm triggered on any unauthorized access attempts.
+      # Describes the purpose of the alarm.
+      MetricName: UnauthorizedAccessAttempts
+      # Specifies the metric to monitor.
+      Namespace: AWS/EC2
+      # Defines the namespace of the metric.
+      Statistic: Sum
+      # Specifies the statistic to evaluate (e.g., Sum of unauthorized attempts).
+      Period: 300
+      # Defines the evaluation period in seconds (e.g., 300 seconds = 5 minutes).
+      EvaluationPeriods: 1
+      # The number of periods over which data is compared to the threshold.
+      Threshold: 1
+      # The threshold value for triggering the alarm (e.g., any unauthorized attempt).
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      # Specifies the condition for triggering the alarm.
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref MyInstance
+          # Monitors the specified EC2 instance.
+      AlarmActions:
+        - arn:aws:sns:us-east-1:772362934603:Default_CloudWatch_Alarms_Topic
+        # The ARN of the SNS topic to notify when the alarm is triggered.
