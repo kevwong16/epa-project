@@ -1,4 +1,4 @@
-# WordPress E-commerce Project: Deploying via LEMP Stack on AWS
+# WordPress E-commerce Project: Deploying via LEMP Stack on AWS Console
 
 This project automates the deployment of a WordPress-based e-commerce website using a LEMP (Linux, Nginx, MySQL/MariaDB, PHP) stack on AWS. The infrastructure is managed using CloudFormation, secured with Cloudflare, and integrated with CI/CD pipelines via GitHub Actions.
 
